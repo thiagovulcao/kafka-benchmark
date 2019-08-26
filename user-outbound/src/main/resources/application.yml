@@ -1,0 +1,35 @@
+server:
+    port: 9001
+#    context-path: /user-outbound
+
+spring:
+    application:
+        name: user-outbound
+    jackson:
+        date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    logging:
+        pattern:
+            console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([${springAppName:-},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}]){yellow} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+        level:
+            ROOT: DEBUG
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
+            database: user-outbound
+    cloud:
+        stream:
+            kafka:
+                binder:
+                    brokers: 10.11.57.9:9092, 10.11.57.9:9098
+                    zkNodes: 10.11.57.9:2181
+                    replicationFactor: 2
+            bindings:
+                user-output:
+                    destination: kafka-benchmark.user-output
+                    group: user-outbound
+                    contentType: application/json
+                    partitionCount: 2
+application:
+    variables:
+        page-size: 1000
