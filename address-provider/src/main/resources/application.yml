@@ -1,10 +1,10 @@
 server:
-    port: 9001
-    context-path: /user-outbound
+    port: 9002
+    context-path: /user-address
 
 spring:
     application:
-        name: user-outbound
+        name: user-address
     jackson:
         date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
     logging:
@@ -12,11 +12,25 @@ spring:
             console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([${springAppName:-},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}]){yellow} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
         level:
             ROOT: DEBUG
-    data:
-        mongodb:
-            host: localhost
-            port: 27017
-            database: user-outbound
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://localhost:5432/user_address
+        username: postgresql
+        password: postgresql
+        hikari:
+            minimumiIdle: 5
+            maximum-pool-size: 20
+            idle-timeout: 30000
+            pool-name: SpringBootJPAHikariCP
+            max-lifetime: 2000000
+            connection-timeout: 30000
+    jpa:
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                jdbc:
+                    lob:
+                        non_contextual_creation: true
     cloud:
         stream:
             kafka:
@@ -30,6 +44,7 @@ spring:
                     group: user-outbound
                     contentType: application/json
                     partitionCount: 2
-application:
-    variables:
-        page-size: 1000
+                user-address-output:
+                    destination: kafka-benchmark.user-address-output
+                    group: user-address
+                    contentType: application/json
