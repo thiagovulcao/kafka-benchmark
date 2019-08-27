@@ -29,7 +29,7 @@ public class PublishUsersImpl implements PublishUsers {
     public void publish() {
         log.info("pubish started at ", Instant.now());
         final long totalUsers = gateway.count();
-        for (int i = 0; i <= totalUsers; i++) {
+        for (int i = 0; i <= totalUsers / pageSize; i++) {
             gateway.findAll(i, pageSize)
                 .getContent()
                 .parallelStream()

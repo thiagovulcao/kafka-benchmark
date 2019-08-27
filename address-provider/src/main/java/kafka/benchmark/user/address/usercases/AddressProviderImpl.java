@@ -13,6 +13,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,9 +39,11 @@ public class AddressProviderImpl implements AddressProvider {
 
     @StreamListener(InputStream.USER_INPUT)
     public void listener(final UserAddressPayload payload) {
+        log.info("started process with payload {} at {}", payload, Instant.now());
         final UserAddressPayload result = provide(payload);
         if (Objects.nonNull(result.getAddresses()) && !result.getAddresses().isEmpty()) {
             outputStream.userAddress().send(MessageBuilder.withPayload(result).build());
+            log.info("completed process with result {} at {} with {} addresses", result, Instant.now(), result.getAddresses().size());
         }
     }
 }
